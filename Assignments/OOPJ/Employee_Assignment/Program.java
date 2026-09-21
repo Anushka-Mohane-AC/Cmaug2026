@@ -1,185 +1,37 @@
 import java.io.*;
-import java.util.Scanner;
-
-abstract class Employee implements Serializable {
-    String name, address, gender;
-    int age;
-    float basicSalary;
-
-    Employee(String name, String address, int age, String gender, float basicSalary) {
-        this.name = name;
-        this.address = address;
-        this.age = (age < 18 || age > 65) ? 21 : age;
-        this.gender = gender;
-        this.basicSalary = basicSalary;
-    }
-
-    abstract void display();
-}
-
-class Manager extends Employee {
-    float hra;
-
-    Manager(String name, String address, int age, String gender, float basicSalary, float hra) {
-        super(name, address, age, gender, basicSalary);
-        this.hra = hra;
-    }
-
-    void display() {
-        System.out.println("[Manager] Name: " + name + " | Age: " + age + " | Gender: " + gender +
-                " | Address: " + address + " | Salary: " + basicSalary + " | HRA: " + hra);
-    }
-}
-
-class Engineer extends Employee {
-    float overtime;
-
-    Engineer(String name, String address, int age, String gender, float basicSalary, float overtime) {
-        super(name, address, age, gender, basicSalary);
-        this.overtime = overtime;
-    }
-
-    void display() {
-        System.out.println("[Engineer] Name: " + name + " | Age: " + age + " | Gender: " + gender +
-                " | Address: " + address + " | Salary: " + basicSalary + " | Overtime: " + overtime);
-    }
-}
-
-class SalesPerson extends Employee {
-    float commission;
-
-    SalesPerson(String name, String address, int age, String gender, float basicSalary, float commission) {
-        super(name, address, age, gender, basicSalary);
-        this.commission = commission;
-    }
-
-    void display() {
-        System.out.println("[Sales Person] Name: " + name + " | Age: " + age + " | Gender: " + gender +
-                " | Address: " + address + " | Salary: " + basicSalary + " | Commission: " + commission);
-    }
-}
-
-// Doubly Linked List Node
-class Node implements Serializable {
-    Employee data;
-    Node prev, next;
-
-    Node(Employee data) {
-        this.data = data;
-    }
-}
-
-// Doubly Linked List implementation
-class DoublyLinkedList implements Serializable {
-    Node head, tail;
-    transient Node current;
-
-    void add(Employee emp) {
-        Node newNode = new Node(emp);
-        if (head == null) {
-            head = tail = current = newNode;
-        } else {
-            tail.next = newNode;
-            newNode.prev = tail;
-            tail = newNode;
-        }
-        System.out.println("Employee added successfully!");
-    }
-
-    void displayAll() {
-        if (head == null) {
-            System.out.println("No records found.");
-            return;
-        }
-        Node temp = head;
-        while (temp != null) {
-            temp.data.display();
-            temp = temp.next;
-        }
-    }
-
-    void displayFirst() {
-        if (head == null) { System.out.println("List is empty."); return; }
-        current = head;
-        current.data.display();
-    }
-
-    void displayLast() {
-        if (tail == null) { System.out.println("List is empty."); return; }
-        current = tail;
-        current.data.display();
-    }
-
-    void displayNext() {
-        if (head == null) { System.out.println("List is empty."); return; }
-        if (current == null) current = head;
-        else if (current.next != null) current = current.next;
-        else System.out.println("(End of list reached)");
-        current.data.display();
-    }
-
-    void displayPrev() {
-        if (head == null) { System.out.println("List is empty."); return; }
-        if (current == null) current = tail;
-        else if (current.prev != null) current = current.prev;
-        else System.out.println("(Beginning of list reached)");
-        current.data.display();
-    }
-
-    int getCount() {
-        int count = 0;
-        Node temp = head;
-        while (temp != null) {
-            count++;
-            temp = temp.next;
-        }
-        return count;
-    }
-
-    Employee[] toArray() {
-        int size = getCount();
-        Employee[] arr = new Employee[size];
-        Node temp = head;
-        int i = 0;
-        while (temp != null) {
-            arr[i++] = temp.data;
-            temp = temp.next;
-        }
-        return arr;
-    }
-}
 
 public class Program {
-    static Scanner sc = new Scanner(System.in);
     static DoublyLinkedList list = new DoublyLinkedList();
+    static String fileName = "emp_data.txt";
 
-    static Employee readAndCreate(int type) {
+    static Employee createEmployee(int type) {
         System.out.print("Enter Name: ");
-        String name = sc.nextLine();
+        String name = Console_Emp.getString();
         System.out.print("Enter Address: ");
-        String address = sc.nextLine();
+        String addr = Console_Emp.getString();
         System.out.print("Enter Age: ");
-        int age = Integer.parseInt(sc.nextLine());
+        int age = Console_Emp.getInt();
         System.out.print("Enter Gender: ");
-        String gender = sc.nextLine();
+        String gender = Console_Emp.getString();
         System.out.print("Enter Basic Salary: ");
-        float salary = Float.parseFloat(sc.nextLine());
+        float sal = Console_Emp.getFloat();
 
         if (type == 1) {
             System.out.print("Enter HRA: ");
-            float hra = Float.parseFloat(sc.nextLine());
-            return new Manager(name, address, age, gender, salary, hra);
+            float hra = Console_Emp.getFloat();
+            return new Manager(name, addr, age, gender, sal, hra);
         } else if (type == 2) {
             System.out.print("Enter Overtime: ");
-            float overtime = Float.parseFloat(sc.nextLine());
-            return new Engineer(name, address, age, gender, salary, overtime);
+            float ot = Console_Emp.getFloat();
+            return new Engineer(name, addr, age, gender, sal, ot);
         } else {
             System.out.print("Enter Commission: ");
-            float comm = Float.parseFloat(sc.nextLine());
-            return new SalesPerson(name, address, age, gender, salary, comm);
+            float comm = Console_Emp.getFloat();
+            return new SalesPerson(name, addr, age, gender, sal, comm);
         }
     }
 
+    // Bubble Sort
     static void bubbleSort(Employee[] arr, int n, boolean asc) {
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
@@ -193,23 +45,22 @@ public class Program {
         }
     }
 
-    static void printSorted(Class<?> filterType, boolean asc) {
-        Employee[] fullArray = list.toArray();
-
-        int matchCount = 0;
-        for (Employee e : fullArray) {
-            if (filterType == null || filterType.isInstance(e)) matchCount++;
+    static void printSorted(Class<?> filterClass, boolean asc) {
+        Employee[] all = list.toArray();
+        int count = 0;
+        for (Employee e : all) {
+            if (filterClass == null || filterClass.isInstance(e)) count++;
         }
 
-        if (matchCount == 0) {
-            System.out.println("No records found to sort.");
+        if (count == 0) {
+            System.out.println("No matching records found.");
             return;
         }
 
-        Employee[] filtered = new Employee[matchCount];
+        Employee[] filtered = new Employee[count];
         int idx = 0;
-        for (Employee e : fullArray) {
-            if (filterType == null || filterType.isInstance(e)) {
+        for (Employee e : all) {
+            if (filterClass == null || filterClass.isInstance(e)) {
                 filtered[idx++] = e;
             }
         }
@@ -221,83 +72,111 @@ public class Program {
     }
 
     public static void main(String[] args) {
-        int mainChoice = 0;
+        int ch = 0;
+
         do {
-            System.out.println("\n========== MAIN MENU ==========");
-            System.out.println("1. Add an Employee\n2. Display\n3. Sort\n4. Save to File\n5. Load from File\n6. Exit");
+            System.out.println("1. Add an Employee");
+            System.out.println("2. Display");
+            System.out.println("3. Sort");
+            System.out.println("4. Save to File");
+            System.out.println("5. Load from File");
+            System.out.println("6. Exit");
             System.out.print("Enter choice: ");
-            mainChoice = Integer.parseInt(sc.nextLine());
+            ch = Console_Emp.getInt();
 
-            switch (mainChoice) {
+            switch (ch) {
                 case 1:
-                    char addOpt;
+                    String addOpt = "";
                     do {
-                        System.out.println("\n--- Add Employee ---");
-                        System.out.println("a. Manager\nb. Engineer\nc. Sales Person\nd. Exit to Main Menu");
-                        System.out.print("Choice: ");
-                        addOpt = sc.nextLine().toLowerCase().charAt(0);
+                        System.out.println("\n1. Add Employee");
+                        System.out.println("a. Manager");
+                        System.out.println("b. Engineer");
+                        System.out.println("c. Sales Person");
+                        System.out.println("d. Exit to Main Menu");
+                        System.out.print("Select role: ");
+                        addOpt = Console_Emp.getString().toLowerCase();
 
-                        if (addOpt == 'a') list.add(readAndCreate(1));
-                        else if (addOpt == 'b') list.add(readAndCreate(2));
-                        else if (addOpt == 'c') list.add(readAndCreate(3));
-                    } while (addOpt != 'd');
+                        if (addOpt.equals("a")) list.add(createEmployee(1));
+                        else if (addOpt.equals("b")) list.add(createEmployee(2));
+                        else if (addOpt.equals("c")) list.add(createEmployee(3));
+                        else if (!addOpt.equals("d")) System.out.println("Invalid option.");
+                    } while (!addOpt.equals("d"));
                     break;
 
                 case 2:
-                    char dispOpt;
+                    String dispOpt = "";
                     do {
-                        System.out.println("\n--- Display Menu ---");
-                        System.out.println("a. All Employees\nb. First Employee\nc. Next Employee\nd. Previous Employee\ne. Last Employee\nf. Exit to Main Menu");
-                        System.out.print("Choice: ");
-                        dispOpt = sc.nextLine().toLowerCase().charAt(0);
+                        System.out.println("\n2. Display");
+                        System.out.println("a. All Employees");
+                        System.out.println("b. First Employee");
+                        System.out.println("c. Next Employee");
+                        System.out.println("d. Previous Employee");
+                        System.out.println("e. Last Employee");
+                        System.out.println("f. Exit to Main Menu");
+                        System.out.print("Select option: ");
+                        dispOpt = Console_Emp.getString().toLowerCase();
 
-                        if (dispOpt == 'a') list.displayAll();
-                        else if (dispOpt == 'b') list.displayFirst();
-                        else if (dispOpt == 'c') list.displayNext();
-                        else if (dispOpt == 'd') list.displayPrev();
-                        else if (dispOpt == 'e') list.displayLast();
-                    } while (dispOpt != 'f');
+                        if (dispOpt.equals("a")) list.displayAll();
+                        else if (dispOpt.equals("b")) list.displayFirst();
+                        else if (dispOpt.equals("c")) list.displayNext();
+                        else if (dispOpt.equals("d")) list.displayPrev();
+                        else if (dispOpt.equals("e")) list.displayLast();
+                        else if (!dispOpt.equals("f")) System.out.println("Invalid option.");
+                    } while (!dispOpt.equals("f"));
                     break;
 
                 case 3:
-                    char sortOpt;
+                    String sortOpt = "";
                     do {
-                        System.out.println("\n--- Sort Menu ---");
-                        System.out.println("a. All Managers\nb. All Engineers\nc. All Sales Person\nd. All Employees Ascending\ne. All Employees Descending\nf. Exit to Main Menu");
-                        System.out.print("Choice: ");
-                        sortOpt = sc.nextLine().toLowerCase().charAt(0);
+                        System.out.println("\n3. Sort");
+                        System.out.println("a. All Managers");
+                        System.out.println("b. All Engineers");
+                        System.out.println("c. All Sales Person");
+                        System.out.println("d. All Employees Alphabetic order ascending");
+                        System.out.println("e. All Employees Alphabetic order descending");
+                        System.out.println("f. Exit to Main Menu");
+                        System.out.print("Select option: ");
+                        sortOpt = Console_Emp.getString().toLowerCase();
 
-                        if (sortOpt == 'a') printSorted(Manager.class, true);
-                        else if (sortOpt == 'b') printSorted(Engineer.class, true);
-                        else if (sortOpt == 'c') printSorted(SalesPerson.class, true);
-                        else if (sortOpt == 'd') printSorted(null, true);
-                        else if (sortOpt == 'e') printSorted(null, false);
-                    } while (sortOpt != 'f');
+                        if (sortOpt.equals("a")) printSorted(Manager.class, true);
+                        else if (sortOpt.equals("b")) printSorted(Engineer.class, true);
+                        else if (sortOpt.equals("c")) printSorted(SalesPerson.class, true);
+                        else if (sortOpt.equals("d")) printSorted(null, true);
+                        else if (sortOpt.equals("e")) printSorted(null, false);
+                        else if (!sortOpt.equals("f")) System.out.println("Invalid option.");
+                    } while (!sortOpt.equals("f"));
                     break;
 
                 case 4:
-                    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("employees.dat"))) {
+                    try {
+                        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName));
                         oos.writeObject(list);
-                        System.out.println("Saved successfully to employees.dat!");
+                        oos.close();
+                        System.out.println("Saved successfully to " + fileName);
                     } catch (Exception e) {
-                        System.out.println("Save error: " + e.getMessage());
+                        System.out.println("Error saving: " + e.getMessage());
                     }
                     break;
 
                 case 5:
-                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("employees.dat"))) {
+                    try {
+                        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName));
                         list = (DoublyLinkedList) ois.readObject();
                         list.current = list.head;
-                        System.out.println("Loaded successfully from employees.dat!");
+                        ois.close();
+                        System.out.println("Loaded successfully from " + fileName);
                     } catch (Exception e) {
-                        System.out.println("Load error: " + e.getMessage());
+                        System.out.println("Error loading: " + e.getMessage());
                     }
                     break;
 
                 case 6:
-                    System.out.println("Exiting. Bye!");
+                    System.out.println("Terminating program.");
                     break;
+
+                default:
+                    System.out.println("Invalid selection. Try again.");
             }
-        } while (mainChoice != 6);
+        } while (ch != 6);
     }
 }
